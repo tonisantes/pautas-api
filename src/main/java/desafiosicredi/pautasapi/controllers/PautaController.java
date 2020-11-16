@@ -32,7 +32,8 @@ import org.springframework.web.server.ResponseStatusException;
 import desafiosicredi.pautasapi.config.RabbitMQ;
 import desafiosicredi.pautasapi.dto.AbrirSessaoDTO;
 import desafiosicredi.pautasapi.dto.PautaDTO;
-import desafiosicredi.pautasapi.dto.PautaRespostaDTO;
+import desafiosicredi.pautasapi.dto.StatusPautaDTO;
+import desafiosicredi.pautasapi.dto.StatusVotoDTO;
 import desafiosicredi.pautasapi.dto.VotoDTO;
 import desafiosicredi.pautasapi.model.Pauta;
 import desafiosicredi.pautasapi.model.StatusPauta;
@@ -56,22 +57,22 @@ public class PautaController {
     private TransactionTemplate transactionTemplate;
 
     @GetMapping("/pautas/{id}")
-    public Pauta adicionar(@PathVariable Integer id) {
+    public StatusPautaDTO adicionar(@PathVariable Integer id) {
         Pauta pauta = pautaRepository.findById(id).orElse(null);
 
         if (pauta == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pauta não encontrada");
         }
 
-        return pauta;
+        return StatusPautaDTO.create(pauta);
     }
 
     @PostMapping("/pautas")
     @ResponseStatus(HttpStatus.CREATED)
-    public Pauta adicionar(@RequestBody PautaDTO dto) {
+    public StatusPautaDTO adicionar(@RequestBody PautaDTO dto) {
         Pauta pauta = dto.transformar();
         pautaRepository.save(pauta); 
-        return pauta;
+        return StatusPautaDTO.create(pauta);
     }
 
     @PutMapping("/pautas/{id}/abrir")
@@ -101,13 +102,13 @@ public class PautaController {
             }
         });
 
-        this.rabbitTemplate.convertAndSend(RabbitMQ.FILA_VERIFICAR_STATUS_SESSAO, pauta.getId());
+        this.rabbitTemplate.convertAndSend(RabbitMQ.FILA_VERIFICAR_STATUS_PAUTA, pauta.getId());
         return pauta;
         
     }
 
     @PutMapping("/pautas/{id}/votar")
-    public Voto votar(@PathVariable Integer id, @RequestBody VotoDTO dto) {
+    public StatusVotoDTO votar(@PathVariable Integer id, @RequestBody VotoDTO dto) {
         Voto voto = transactionTemplate.execute(new TransactionCallback<Voto>(){
             @Override
             public Voto doInTransaction(TransactionStatus status) {
@@ -135,7 +136,7 @@ public class PautaController {
         });
 
         this.rabbitTemplate.convertAndSend(RabbitMQ.FILA_CONTABILIZAR_VOTO, voto.getId());
-        return voto;
+        return StatusVotoDTO.create(voto);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

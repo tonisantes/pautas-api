@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQ {
 
 	public static String FILA_CONTABILIZAR_VOTO = "pautas.contabilizar-voto";
-	public static String FILA_VERIFICAR_STATUS_SESSAO = "pautas.verificar-status-sessao";
+	public static String FILA_VERIFICAR_STATUS_PAUTA = "pautas.verificar-status-pauta";
 
 	@Bean
 	Queue contabilizarVotoQueue() {
@@ -24,7 +24,7 @@ public class RabbitMQ {
 
 	@Bean
 	Queue verificarStatusSessaoQueue() {
-		return QueueBuilder.durable(FILA_VERIFICAR_STATUS_SESSAO).build();
+		return QueueBuilder.durable(FILA_VERIFICAR_STATUS_PAUTA).build();
 	}
 
 	@Bean
