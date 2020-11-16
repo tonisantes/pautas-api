@@ -14,12 +14,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQ {
 
-	public static String FILA_CONTABILIZAR_VOTO = "pautas.contabilizar-voto";
-	public static String FILA_VERIFICAR_STATUS_PAUTA = "pautas.verificar-status-pauta";
+	public final static String FILA_CONTABILIZAR_VOTO = "pautas.contabilizar-voto";
+	public final static String FILA_CONTABILIZAR_VOTO_DLQ = "pautas.contabilizar-voto.dlq";
+	public final static String FILA_VERIFICAR_STATUS_PAUTA = "pautas.verificar-status-pauta";
 
 	@Bean
 	Queue contabilizarVotoQueue() {
-		return QueueBuilder.durable(FILA_CONTABILIZAR_VOTO).build();
+		return QueueBuilder.durable(FILA_CONTABILIZAR_VOTO)
+			.withArgument("x-dead-letter-exchange", "")
+			.withArgument("x-dead-letter-routing-key", FILA_CONTABILIZAR_VOTO_DLQ).build();
 	}
 
 	@Bean

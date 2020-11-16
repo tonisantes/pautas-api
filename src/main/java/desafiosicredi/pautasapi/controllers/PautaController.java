@@ -76,7 +76,7 @@ public class PautaController {
     }
 
     @PutMapping("/pautas/{id}/abrir")
-    public Pauta abrirSessao(@PathVariable Integer id, @RequestBody AbrirSessaoDTO dto) {
+    public StatusPautaDTO abrirSessao(@PathVariable Integer id, @RequestBody AbrirSessaoDTO dto) {
         Pauta pauta = transactionTemplate.execute(new TransactionCallback<Pauta>(){
             @Override
             public Pauta doInTransaction(TransactionStatus status) {
@@ -86,10 +86,10 @@ public class PautaController {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pauta não encontrada");
                 }
 
-                pauta.setStatus(StatusPauta.SESSAO_INICIADA);
+                pauta.setStatus(StatusPauta.SESSAO_ABERTA);
                 pauta.setInicio(LocalDateTime.now());
 
-                Integer duracao = 60;
+                Integer duracao = 1;
                 if (dto.getDuracao() != null) {
                     duracao = dto.getDuracao();
                 }
@@ -103,7 +103,7 @@ public class PautaController {
         });
 
         this.rabbitTemplate.convertAndSend(RabbitMQ.FILA_VERIFICAR_STATUS_PAUTA, pauta.getId());
-        return pauta;
+        return StatusPautaDTO.create(pauta);
         
     }
 
@@ -118,7 +118,7 @@ public class PautaController {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pauta não encontrada");
                 }
 
-                if (pauta.getStatus() != StatusPauta.SESSAO_INICIADA || LocalDateTime.now().isAfter(pauta.getFim())) {
+                if (pauta.getStatus() != StatusPauta.SESSAO_ABERTA || LocalDateTime.now().isAfter(pauta.getFim())) {
                     throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Pauta não pode receber votações");
                 }
 
