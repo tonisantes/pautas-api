@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -25,7 +26,7 @@ public class Voto {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "pauta_id", nullable = false, foreignKey = @ForeignKey(name="fk_voto_pauta_id"))
 	private Pauta pauta;
 

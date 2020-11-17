@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import javax.validation.ConstraintViolationException;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -107,7 +108,7 @@ public class PautaController {
         
     }
 
-    @PutMapping("/pautas/{id}/votar")
+    @PostMapping("/pautas/{id}/votar")
     public StatusVotoDTO votar(@PathVariable Integer id, @RequestBody VotoDTO dto) {
         Voto voto = transactionTemplate.execute(new TransactionCallback<Voto>(){
             @Override
