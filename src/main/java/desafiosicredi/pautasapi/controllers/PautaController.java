@@ -112,6 +112,7 @@ public class PautaController {
     }
     
     @PostMapping("/pautas/{id}/votar")
+    @ResponseStatus(HttpStatus.CREATED)
     public StatusVotoDTO votar(@PathVariable Integer id, @RequestBody VotoDTO dto) {
         Voto voto = transactionTemplate.execute(new TransactionCallback<Voto>(){
             @Override
