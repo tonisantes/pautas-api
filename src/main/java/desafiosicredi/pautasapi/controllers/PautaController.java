@@ -71,6 +71,9 @@ public class PautaController {
     @PostMapping("/pautas")
     @ResponseStatus(HttpStatus.CREATED)
     public StatusPautaDTO adicionar(@RequestBody PautaDTO dto) {
+        if (dto.getNome() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome da pauta não informado");
+        }
         Pauta pauta = dto.transformar();
         pautaRepository.save(pauta); 
         return StatusPautaDTO.create(pauta);
@@ -107,7 +110,7 @@ public class PautaController {
         return StatusPautaDTO.create(pauta);
         
     }
-
+    
     @PostMapping("/pautas/{id}/votar")
     public StatusVotoDTO votar(@PathVariable Integer id, @RequestBody VotoDTO dto) {
         Voto voto = transactionTemplate.execute(new TransactionCallback<Voto>(){
@@ -138,12 +141,6 @@ public class PautaController {
 
         this.rabbitTemplate.convertAndSend(RabbitMQ.FILA_CONTABILIZAR_VOTO, voto.getId());
         return StatusVotoDTO.create(voto);
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Bad request")
-    public void badRequest() {
-        // 
     }
 
 }

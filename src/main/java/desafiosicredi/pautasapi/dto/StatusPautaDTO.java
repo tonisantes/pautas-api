@@ -1,5 +1,6 @@
 package desafiosicredi.pautasapi.dto;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,10 @@ public class StatusPautaDTO {
     private StatusPauta status;
 
     private Map<TipoVoto, Integer> resultado = new HashMap<>();
+
+    private LocalDateTime inicio;
+
+    private LocalDateTime fim;
 
     public Integer getId() {
         return id;
@@ -42,6 +47,22 @@ public class StatusPautaDTO {
         this.status = status;
     }
 
+    public LocalDateTime getInicio() {
+        return inicio;
+    }
+
+    public void setInicio(LocalDateTime inicio) {
+        this.inicio = inicio;
+    }
+
+    public LocalDateTime getFim() {
+        return fim;
+    }
+
+    public void setFim(LocalDateTime fim) {
+        this.fim = fim;
+    }
+
     public Map<TipoVoto, Integer> getResultado() {
         return resultado;
     }
@@ -55,6 +76,8 @@ public class StatusPautaDTO {
         dto.setId(pauta.getId());
         dto.setNome(pauta.getNome());
         dto.setStatus(pauta.getStatus());
+        dto.setInicio(pauta.getInicio());
+        dto.setFim(pauta.getFim());
 
         dto.resultado.put(TipoVoto.SIM, 0);
         dto.resultado.put(TipoVoto.NAO, 0);

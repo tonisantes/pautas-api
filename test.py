@@ -31,6 +31,7 @@ class PaustasTesteIntegrado():
         cpf = gerar_cpf()
         voto = random.choice(["SIM", "NAO"])
         url = "{}/pautas/{}/votar".format(self._api_url, pauta_id)
+        print("votando..")
         response = requests.post(url, json={"cpfAssociado": cpf, "voto": voto})
         response.raise_for_status()
 
