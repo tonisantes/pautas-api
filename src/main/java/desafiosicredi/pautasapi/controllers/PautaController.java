@@ -1,31 +1,19 @@
 package desafiosicredi.pautasapi.controllers;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
-import javax.validation.ConstraintViolationException;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
-import org.springframework.transaction.reactive.TransactionSynchronization;
-import org.springframework.transaction.reactive.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -41,8 +29,17 @@ import desafiosicredi.pautasapi.model.StatusPauta;
 import desafiosicredi.pautasapi.model.Voto;
 import desafiosicredi.pautasapi.repositories.PautaRepository;
 import desafiosicredi.pautasapi.repositories.VotoRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
+@RequestMapping("/v1/pautas")
+@Tag(name = "pautas", description = "Pautas API")
 public class PautaController {
     
     @Autowired
@@ -57,8 +54,15 @@ public class PautaController {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    @GetMapping("/pautas/{id}")
-    public StatusPautaDTO adicionar(@PathVariable Integer id) {
+    @Operation(summary = "Retorna uma pauta pelo seu id")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200", description = "Pauta retornada com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Pauta não encontrada", content = { 
+            @Content(schema = @Schema(implementation = String.class)) 
+        })
+    })
+    @GetMapping("/{id}")
+    public StatusPautaDTO get(@PathVariable @Parameter(description = "Id da pauta") Integer id) {
         Pauta pauta = pautaRepository.findById(id).orElse(null);
 
         if (pauta == null) {
@@ -68,7 +72,14 @@ public class PautaController {
         return StatusPautaDTO.create(pauta);
     }
 
-    @PostMapping("/pautas")
+    @Operation(summary = "Cria uma pauta")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "201", description = "Pauta criada com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Nome não informado", content = { 
+            @Content(schema = @Schema(implementation = String.class)) 
+        })
+    })
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public StatusPautaDTO adicionar(@RequestBody PautaDTO dto) {
         if (dto.getNome() == null) {
@@ -79,8 +90,17 @@ public class PautaController {
         return StatusPautaDTO.create(pauta);
     }
 
-    @PutMapping("/pautas/{id}/abrir")
-    public StatusPautaDTO abrirSessao(@PathVariable Integer id, @RequestBody AbrirSessaoDTO dto) {
+    @Operation(summary = "Abre a sessão da pauta para votação", description = "A duração da sessão deve ser informada em minutos")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200", description = "Pauta retornada com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Pauta não encontrada", content = { 
+            @Content(schema = @Schema(implementation = String.class)) 
+        })
+    })
+    @PutMapping("/{id}/abrir-sessao")
+    public StatusPautaDTO abrirSessao(
+            @PathVariable @Parameter(description = "Id da pauta") Integer id,
+            @RequestBody @Parameter(description="Duração da sessão de votação em minutos") AbrirSessaoDTO dto) {
         Pauta pauta = transactionTemplate.execute(new TransactionCallback<Pauta>(){
             @Override
             public Pauta doInTransaction(TransactionStatus status) {
@@ -111,9 +131,16 @@ public class PautaController {
         
     }
     
-    @PostMapping("/pautas/{id}/votar")
+    @Operation(summary = "Envia um voto para a pauta especificada")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "201", description = "Voto enviado com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Pauta não encontrada", content = { 
+            @Content(schema = @Schema(implementation = String.class)) 
+        })
+    })
+    @PostMapping("/{id}/votar")
     @ResponseStatus(HttpStatus.CREATED)
-    public StatusVotoDTO votar(@PathVariable Integer id, @RequestBody VotoDTO dto) {
+    public StatusVotoDTO votar(@PathVariable @Parameter(description = "Id da pauta") Integer id, @RequestBody VotoDTO dto) {
         Voto voto = transactionTemplate.execute(new TransactionCallback<Voto>(){
             @Override
             public Voto doInTransaction(TransactionStatus status) {
