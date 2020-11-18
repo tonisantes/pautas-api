@@ -22,7 +22,6 @@ public class Pauta {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
 
-    
     @NotBlank
     @Column(nullable = false)
     private String nome;

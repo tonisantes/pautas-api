@@ -55,7 +55,7 @@ class PautasApiApplicationTests {
 	public void criarPauta() throws Exception {
         PautaDTO payload = new PautaDTO();
         payload.setNome("teste");
-		ResponseEntity<StatusPautaDTO> result = this.restTemplate.postForEntity("http://localhost:" + port + "/pautas", payload, StatusPautaDTO.class);
+		ResponseEntity<StatusPautaDTO> result = this.restTemplate.postForEntity("http://localhost:" + port + "/v1/pautas", payload, StatusPautaDTO.class);
         assertThat(result.getStatusCodeValue()).isEqualTo(201);
         assertThat(result.getBody().getStatus()).isEqualTo(StatusPauta.CRIADA);
 	}
@@ -63,7 +63,7 @@ class PautasApiApplicationTests {
 	@Test
 	public void criarPautaSemNome() throws Exception {
         PautaDTO payload = new PautaDTO();
-		ResponseEntity<String> result = this.restTemplate.postForEntity("http://localhost:" + port + "/pautas", payload, String.class);
+		ResponseEntity<String> result = this.restTemplate.postForEntity("http://localhost:" + port + "/v1/pautas", payload, String.class);
         assertThat(result.getStatusCodeValue()).isEqualTo(400);
 	}
 
@@ -78,7 +78,7 @@ class PautasApiApplicationTests {
 
 		AbrirSessaoDTO payload = new AbrirSessaoDTO();
 		payload.setDuracao(duracao);
-		ResponseEntity<StatusPautaDTO> result = this.restTemplate.exchange("http://localhost:" + port + "/pautas/1/abrir", HttpMethod.PUT, new HttpEntity<>(payload), StatusPautaDTO.class);
+		ResponseEntity<StatusPautaDTO> result = this.restTemplate.exchange("http://localhost:" + port + "/v1/pautas/1/abrir-sessao", HttpMethod.PUT, new HttpEntity<>(payload), StatusPautaDTO.class);
         assertThat(result.getStatusCodeValue()).isEqualTo(200);
 		assertThat(result.getBody().getStatus()).isEqualTo(StatusPauta.SESSAO_ABERTA);
 		assertThat(result.getBody().getInicio().until(result.getBody().getFim(), ChronoUnit.MINUTES)).isEqualTo(duracao);
@@ -94,7 +94,7 @@ class PautasApiApplicationTests {
 		int duracaoPadrao = 1;
 
 		AbrirSessaoDTO payload = new AbrirSessaoDTO();
-		ResponseEntity<StatusPautaDTO> result = this.restTemplate.exchange("http://localhost:" + port + "/pautas/1/abrir", HttpMethod.PUT, new HttpEntity<>(payload), StatusPautaDTO.class);
+		ResponseEntity<StatusPautaDTO> result = this.restTemplate.exchange("http://localhost:" + port + "/v1/pautas/1/abrir-sessao", HttpMethod.PUT, new HttpEntity<>(payload), StatusPautaDTO.class);
         assertThat(result.getStatusCodeValue()).isEqualTo(200);
 		assertThat(result.getBody().getStatus()).isEqualTo(StatusPauta.SESSAO_ABERTA);
 		assertThat(result.getBody().getInicio().until(result.getBody().getFim(), ChronoUnit.MINUTES)).isEqualTo(duracaoPadrao);
@@ -106,7 +106,7 @@ class PautasApiApplicationTests {
 
 		AbrirSessaoDTO payload = new AbrirSessaoDTO();
 		payload.setDuracao(duracao);
-		ResponseEntity<String> result = this.restTemplate.exchange("http://localhost:" + port + "/pautas/1/abrir", HttpMethod.PUT, new HttpEntity<>(payload), String.class);
+		ResponseEntity<String> result = this.restTemplate.exchange("http://localhost:" + port + "/v1/pautas/1/abrir", HttpMethod.PUT, new HttpEntity<>(payload), String.class);
         assertThat(result.getStatusCodeValue()).isEqualTo(404);
 	}
 
@@ -124,7 +124,7 @@ class PautasApiApplicationTests {
 		payload.setCpfAssociado("07290790901");
 		payload.setVoto(TipoVoto.SIM);
 
-		ResponseEntity<StatusVotoDTO> result = this.restTemplate.postForEntity("http://localhost:" + port + "/pautas/1/votar", payload, StatusVotoDTO.class);
+		ResponseEntity<StatusVotoDTO> result = this.restTemplate.postForEntity("http://localhost:" + port + "/v1/pautas/1/votar", payload, StatusVotoDTO.class);
 		assertThat(result.getStatusCodeValue()).isEqualTo(201);
 		assertThat(result.getBody().getStatus()).isEqualTo(StatusVoto.PENDENTE);
 	}
@@ -143,7 +143,7 @@ class PautasApiApplicationTests {
 		payload.setCpfAssociado("07290790901");
 		payload.setVoto(TipoVoto.SIM);
 
-		ResponseEntity<String> result = this.restTemplate.postForEntity("http://localhost:" + port + "/pautas/1/votar", payload, String.class);
+		ResponseEntity<String> result = this.restTemplate.postForEntity("http://localhost:" + port + "/v1/pautas/1/votar", payload, String.class);
 		assertThat(result.getStatusCodeValue()).isEqualTo(412);
 	}
 
@@ -153,7 +153,7 @@ class PautasApiApplicationTests {
 		payload.setCpfAssociado("07290790901");
 		payload.setVoto(TipoVoto.SIM);
 
-		ResponseEntity<String> result = this.restTemplate.postForEntity("http://localhost:" + port + "/pautas/1/votar", payload, String.class);
+		ResponseEntity<String> result = this.restTemplate.postForEntity("http://localhost:" + port + "/v1/pautas/1/votar", payload, String.class);
 		assertThat(result.getStatusCodeValue()).isEqualTo(404);
 	}
 	
@@ -171,7 +171,7 @@ class PautasApiApplicationTests {
 		payload.setCpfAssociado("07290790901");
 		payload.setVoto(TipoVoto.SIM);
 
-		ResponseEntity<String> result = this.restTemplate.postForEntity("http://localhost:" + port + "/pautas/1/votar", payload, String.class);
+		ResponseEntity<String> result = this.restTemplate.postForEntity("http://localhost:" + port + "/v1/pautas/1/votar", payload, String.class);
 		assertThat(result.getStatusCodeValue()).isEqualTo(412);
 	}
 
@@ -196,7 +196,7 @@ class PautasApiApplicationTests {
 		payload.setCpfAssociado(voto.getCpfAssociado());
 		payload.setVoto(TipoVoto.SIM);
 
-		ResponseEntity<String> result = this.restTemplate.postForEntity("http://localhost:" + port + "/pautas/1/votar", payload, String.class);
+		ResponseEntity<String> result = this.restTemplate.postForEntity("http://localhost:" + port + "/v1/pautas/1/votar", payload, String.class);
 		assertThat(result.getStatusCodeValue()).isEqualTo(412);
 	}
 
