@@ -21,7 +21,7 @@ def gerar_cpf():
 
 
 class PaustasTesteIntegrado():
-    def __init__(self, api_url="http://localhost:8080", duracao_sessao=1, total_votos=10000):
+    def __init__(self, api_url="http://localhost:8080/v1", duracao_sessao=1, total_votos=10000):
         self._api_url = api_url
         self._duracao_sessao = duracao_sessao
         self._total_votos = total_votos
@@ -43,7 +43,7 @@ class PaustasTesteIntegrado():
         response.raise_for_status()
         pauta = response.json()
 
-        url = "{}/pautas/{}/abrir".format(self._api_url, pauta["id"])
+        url = "{}/pautas/{}/abrir-sessao".format(self._api_url, pauta["id"])
         response = requests.put(url, json={"duracao": self._duracao_sessao})
         response.raise_for_status()
 
