@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import desafiosicredi.pautasapi.config.RabbitMQ;
+import desafiosicredi.pautasapi.config.RabbitMQConfig;
 import desafiosicredi.pautasapi.dto.AbrirSessaoDTO;
 import desafiosicredi.pautasapi.dto.PautaDTO;
 import desafiosicredi.pautasapi.dto.StatusPautaDTO;
@@ -165,7 +165,7 @@ public class PautaController {
         });
 
         // Enviando a pauta para verificação assincrona.
-        this.rabbitTemplate.convertAndSend(RabbitMQ.FILA_VERIFICAR_STATUS_PAUTA, pauta.getId());
+        this.rabbitTemplate.convertAndSend(RabbitMQConfig.FILA_VERIFICAR_STATUS_PAUTA, pauta.getId());
 
         log.info("Pauta " + pauta.getId() + "aberta para votação");
         return StatusPautaDTO.create(pauta);
@@ -237,7 +237,7 @@ public class PautaController {
         });
 
         // Enviando o voto para o rabbit.
-        this.rabbitTemplate.convertAndSend(RabbitMQ.FILA_CONTABILIZAR_VOTO, voto.getId());
+        this.rabbitTemplate.convertAndSend(RabbitMQConfig.FILA_CONTABILIZAR_VOTO, voto.getId());
 
         log.info("Voto " + voto.getId() + ", associado " + voto.getCpfAssociado());
         return StatusVotoDTO.create(voto);

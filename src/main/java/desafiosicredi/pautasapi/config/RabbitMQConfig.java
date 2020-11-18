@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
-public class RabbitMQ {
+public class RabbitMQConfig {
 
 	public final static String FILA_CONTABILIZAR_VOTO = "pautas.contabilizar-voto";
 	public final static String FILA_CONTABILIZAR_VOTO_DLQ = "pautas.contabilizar-voto.dlq";
