@@ -75,6 +75,8 @@ http://localhost:8080/swagger-ui.html
 
 Fiz um script em Python para criar uma pauta, abrir uma sessão e então disparar vários votos utilizando concorrência.
 
+O fonte desse script está em https://github.com/tonisantes/pautas-test.
+
 Para rodar o script primeiro é necessário inciar o `pautas-api` e o `pautas-worker` e então rodar o seguinte comando:
 
 ```bash
@@ -85,4 +87,4 @@ docker run --network=host tonisantes/pautas-test:1.0.0 --duracao_sessao=1 --tota
 
 Tentei ao máximo cumprir as tarefas bônus.
 
-Todos os testes que fiz utilizando o serviço https://user-info.herokuapp.com/users/{cpf} retoram `UNABLE_TO_VOTE`.
+Todos os testes que fiz utilizando o serviço https://user-info.herokuapp.com/users/{cpf} retornaram `UNABLE_TO_VOTE`.
