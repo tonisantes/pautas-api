@@ -9,11 +9,9 @@
 
 Decidi criar o componente `pautas-worker` pois achei por bem realizar o processamento dos votos de forma assincrona. O maior motivador dessa decisão foi o fato de em cada voto ser necessário consultar um sistema externo para validação do CPF do associado (como sugerido pelas tarefas bônus do desafio).
 
-Como não tenho controle da estabilidade de um sistema externo, consiro sensato manter o processamento assincrono. A ideia é apenas utilizar a API para registrar a "intenção de voto" do associado, e então despachar uma mensagem para que o `pautas-worker` entre em ação na tentativa de processar o voto.
+Como não tenho controle da estabilidade de um sistema externo, considero sensato manter o processamento assincrono. A ideia é apenas utilizar a API para registrar a "intenção de voto" do associado, e então despachar uma mensagem para que o `pautas-worker` entre em ação na tentativa de processar o voto.
 
 Também utilizo o `pautas-worker` para verificar de tempos em tempos se uma sessão de uma pauta já encerrou, ou se foi concluída, ou se ainda está aguardando o processamento dos votos.
-
-Mais detalhes sobre minhas escolhas nos comentários das classes `PautaController.java` e `VotoController.java`.  
 
 ### Breve resumo das entidades escolhidas:
 
@@ -33,6 +31,15 @@ A entidade `Voto` possui os seguintes possíveis status:
 - `CONTABILIZADO`
 - `REJEITADO`
 - `ERRO`
+
+### Principais endpoints
+
+- `POST /v1/pautas` - Cria uma pauta
+- `PUT /v1/pautas/{id}/abrir-sessao` - Abre uma pauta para receber votações
+- `POST /v1/pautas/{id}/votar` - Recebe uma "intenção de voto" (O CPF do associado e seu voto SIM ou NAO vao no payload)
+- `GET /v1/pautas/{id}` - Busca uma pauta (aqui é possível ver o resultado da Pauta, que é o objetivo do desafio)
+
+Mais detalhes sobre minhas escolhas nos comentários das classes `PautaController.java` e `VotoController.java`. 
 
 ## Pré-requisitos para rodar a API
 
@@ -63,3 +70,19 @@ mvn spring-boot:run
 ## Documentação da API
 
 http://localhost:8080/swagger-ui.html
+
+## Teste de performance
+
+Fiz um script em Python para criar uma pauta, abrir uma sessão e então disparar vários votos utilizando concorrência.
+
+Para rodar o script primeiro é necessário inciar o `pautas-api` e o `pautas-worker` e então rodar o seguinte comando:
+
+```bash
+docker run --network=host tonisantes/pautas-test:1.0.0 --duracao_sessao=1 --total_votos=10000
+```
+
+## Observações
+
+Tentei ao máximo cumprir as tarefas bônus.
+
+Todos os testes que fiz utilizando o serviço https://user-info.herokuapp.com/users/{cpf} retoram `UNABLE_TO_VOTE`.
